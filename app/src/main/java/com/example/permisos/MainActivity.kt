@@ -1,10 +1,16 @@
 package com.example.permisos
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.permisos.databinding.ActivityMainBinding
@@ -35,8 +41,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                val imagenBitMap = intent?.extras?.get("data") as Bitmap
+                binding.ivFoto.setImageBitmap(imagenBitMap)
+            }
+        }
+
     private fun abrirCamara() {
-        Toast.makeText(this, "Abrir camara", Toast.LENGTH_SHORT).show()
+        startForResult.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
     }
 
     private fun solicitarPermisoCamara() {
